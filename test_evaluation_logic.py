@@ -66,7 +66,9 @@ def test_path_length_calculation():
     """Test path length calculation function."""
     print("Testing path length calculation...")
     
-    # Simple test trajectory
+    # Simple test trajectory: forms a square
+    # [0,0] → [1,0] → [1,1] → [0,1]
+    # Length: 1 + 1 + 1 = 3.0
     traj = np.array([
         [0.0, 0.0],
         [1.0, 0.0],
@@ -74,7 +76,7 @@ def test_path_length_calculation():
         [0.0, 1.0],
     ])
     
-    # Calculate expected length: 1 + 1 + sqrt(2)
+    # Calculate expected length: 1 + 1 + 1 = 3
     expected = 3.0
     
     # Path length function (from evaluation script)
@@ -85,7 +87,7 @@ def test_path_length_calculation():
         return float(np.sum(np.linalg.norm(diffs, axis=1)))
     
     calculated = path_length(traj)
-    assert abs(calculated - expected) < 0.001, f"Path length should be ~{expected}, got {calculated}"
+    assert abs(calculated - expected) < 0.001, f"Path length should be {expected}, got {calculated}"
     
     # Test empty trajectory
     assert path_length(None) == 0.0, "None trajectory should have 0 length"

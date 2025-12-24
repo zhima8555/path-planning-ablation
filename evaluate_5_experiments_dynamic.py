@@ -27,7 +27,7 @@ import time
 import subprocess
 from dataclasses import dataclass
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 import numpy as np
 import torch
@@ -218,7 +218,7 @@ def run_rrt_apf(map_type: str, seed: int, max_steps: int) -> EpisodeResult:
 class PPOPolicy:
     """Generic PPO policy wrapper."""
 
-    def __init__(self, model, device: str | None = None):
+    def __init__(self, model, device: Optional[str] = None):
         if device is None:
             device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.device = torch.device(device)

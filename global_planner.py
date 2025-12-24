@@ -16,6 +16,10 @@ class SmartAStarPlanner:
         """Returns a simple straight-line path from start to goal."""
         if start is None or goal is None:
             return []
+        
+        # Ensure start and goal are numpy arrays
+        start = np.array(start, dtype=np.float32)
+        goal = np.array(goal, dtype=np.float32)
             
         # Simple straight-line path
         num_waypoints = 10

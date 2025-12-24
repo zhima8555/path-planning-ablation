@@ -189,6 +189,9 @@ def train(model_type='full', use_astar=True, max_episodes=MAX_EPISODES, seed=Non
         np.random.seed(seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed(seed)
+            torch.cuda.manual_seed_all(seed)  # For multi-GPU
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
     print("=" * 60)
     print(f"消融实验训练")
     print(f"  模型类型: {model_type}")

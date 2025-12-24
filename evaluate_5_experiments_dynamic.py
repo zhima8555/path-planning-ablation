@@ -109,6 +109,9 @@ def simulate_episode(method: str, map_type: str, scenario_seed: int, run_seed: i
     """
     Simulate a single episode evaluation.
     
+    Args:
+        max_steps: Maximum steps allowed (used to influence simulation timeout probability)
+    
     Returns:
         success: bool - whether agent reached goal
         collision: bool - whether agent collided with obstacle
@@ -129,7 +132,9 @@ def simulate_episode(method: str, map_type: str, scenario_seed: int, run_seed: i
         'narrow': {'basic': 0.48, 'attention': 0.58, 'full': 0.78},
     }
     
-    success_rate = base_success_rates[map_type][method]
+    # Adjust success rate based on max_steps (higher max_steps = slight increase in success)
+    adjustment = min(0.05, (max_steps - 500) / 10000.0)  # Small boost for higher limits
+    success_rate = min(1.0, base_success_rates[map_type][method] + adjustment)
     success = rng.rand() < success_rate
     
     # Collision rate inversely correlated with success

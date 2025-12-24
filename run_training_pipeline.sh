@@ -54,6 +54,7 @@ fi
 echo ""
 echo "================================================================================"
 echo "Step 2/4: Training Attention Model (6000 episodes, seed=43)"
+echo "  Note: Uses --no-astar to ablate A* path guidance (tests attention only)"
 echo "================================================================================"
 if [ "$TORCH_AVAILABLE" = true ]; then
     python3 train_ablation.py --model attention --no-astar --episodes 6000 --seed 43

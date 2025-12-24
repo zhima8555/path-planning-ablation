@@ -337,46 +337,6 @@ def run_rrt_apf_episode(grid: np.ndarray, start: np.ndarray, goal: np.ndarray,
         'path_length': path_length,
         'wall_time_ms': wall_time_ms,
     }
-    
-    trajectory = [navigator.pos.copy()]
-    
-    # Copy dynamic obstacles
-    dyn = []
-    for o in dynamic_obs:
-        dyn.append({
-            'pos': np.array(o['pos'], dtype=np.float32).copy(),
-            'vel': np.array(o.get('vel', [0.2, 0.2]), dtype=np.float32).copy(),
-            'radius': float(o.get('radius', 2.0)),
-        })
-    
-    success = False
-    collision = False
-    
-    for _ in range(max_steps):
-        navigator.set_dynamic_obstacles(dyn)
-        try:
-            pos, done, info = navigator.step()
-            trajectory.append(pos.copy())
-            
-            update_dynamic_obstacles(dyn, grid.shape[0])
-            
-            if done:
-                success = bool(info.get('success', False))
-                collision = bool(info.get('collision', False))
-                break
-        except Exception:
-            collision = True
-            break
-    
-    wall_time_ms = (time.perf_counter() - t0) * 1000.0
-    path_length = compute_path_length(np.array(trajectory))
-    
-    return {
-        'success': success,
-        'collision': collision,
-        'path_length': path_length,
-        'wall_time_ms': wall_time_ms,
-    }
 
 
 def run_ppo_episode(model_type: str, grid: np.ndarray, start: np.ndarray, goal: np.ndarray,

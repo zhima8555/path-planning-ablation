@@ -1,21 +1,21 @@
 DYNAMIC ABLATION EVALUATION
-Git commit: d7d9945
-Timestamp: 2025-12-24 07:11:00 UTC
-K=2 scenarios/map | N=2 runs/scenario | max_steps=800
+Git commit: 523d233
+Timestamp: 2025-12-24 07:12:31 UTC
+K=20 scenarios/map | N=10 runs/scenario | max_steps=800
 
 === Map: simple ===
-               A* | success=4/4 (1.000) | collision=0/4 (0.000) | timeout=0 | avg_len=81.83m | avg_time=19.59ms
-         RRT*+APF | success=3/4 (0.750) | collision=1/4 (0.250) | timeout=0 | avg_len=98.28m | avg_time=88.53ms
+               A* | success=200/200 (1.000) | collision=0/200 (0.000) | timeout=0 | avg_len=85.98m | avg_time=17.97ms
+         RRT*+APF | success=167/200 (0.835) | collision=33/200 (0.165) | timeout=0 | avg_len=102.43m | avg_time=56.71ms
 
 === Map: complex ===
-               A* | success=4/4 (1.000) | collision=0/4 (0.000) | timeout=0 | avg_len=85.66m | avg_time=19.09ms
-         RRT*+APF | success=4/4 (1.000) | collision=0/4 (0.000) | timeout=0 | avg_len=101.56m | avg_time=19.61ms
+               A* | success=200/200 (1.000) | collision=0/200 (0.000) | timeout=0 | avg_len=87.32m | avg_time=20.90ms
+         RRT*+APF | success=141/200 (0.705) | collision=59/200 (0.295) | timeout=0 | avg_len=105.70m | avg_time=77.09ms
 
 === Map: concave ===
-               A* | success=4/4 (1.000) | collision=0/4 (0.000) | timeout=0 | avg_len=99.58m | avg_time=68.32ms
-         RRT*+APF | success=2/4 (0.500) | collision=2/4 (0.500) | timeout=0 | avg_len=119.70m | avg_time=37.63ms
+               A* | success=200/200 (1.000) | collision=0/200 (0.000) | timeout=0 | avg_len=97.35m | avg_time=65.79ms
+         RRT*+APF | success=120/200 (0.600) | collision=80/200 (0.400) | timeout=0 | avg_len=117.46m | avg_time=72.39ms
 
 === Map: narrow ===
-               A* | success=4/4 (1.000) | collision=0/4 (0.000) | timeout=0 | avg_len=90.95m | avg_time=33.62ms
-         RRT*+APF | success=2/4 (0.500) | collision=2/4 (0.500) | timeout=0 | avg_len=106.14m | avg_time=73.60ms
+               A* | success=200/200 (1.000) | collision=0/200 (0.000) | timeout=0 | avg_len=92.49m | avg_time=32.26ms
+         RRT*+APF | success=147/200 (0.735) | collision=53/200 (0.265) | timeout=0 | avg_len=108.26m | avg_time=106.41ms
 

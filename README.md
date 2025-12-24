@@ -10,6 +10,22 @@ This repository contains an ablation study comparing 5 path planning methods wit
 4. **PPO (Dual-Att)** - PPO with Dual-Attention mechanism but without A* guidance
 5. **Ours (Full)** - Complete model with A* guidance + Dual-Attention PPO
 
+## Quick Reference
+
+```bash
+# Full pipeline (train + evaluate)
+python run_dynamic_ablation_pipeline.py --train --evaluate
+
+# Evaluate only (if models already trained)
+python run_dynamic_ablation_pipeline.py --evaluate-only
+
+# View results
+cat ablation5_dynamic_metrics.txt
+
+# Run validation tests
+python test_evaluation_logic.py
+```
+
 ## Evaluation Protocol
 
 ### Dynamic Evaluation
@@ -190,6 +206,28 @@ If the main repository is not set up, the evaluation scripts will fail with modu
 - `dynamic_obstacles_metrics.py` - Evaluation on concave/narrow maps only (3 methods)
 - `run_ablation_evaluation.py` - Comprehensive ablation with visualizations
 - `train_ablation.py` - Unified training script for all PPO variants
+- `test_evaluation_logic.py` - Validation tests for evaluation logic
+
+## Troubleshooting
+
+### Import Errors
+If you see `ModuleNotFoundError` for `env`, `map_generator`, `global_planner`, or `model`:
+- Ensure the main path-planning repository is set up in the parent directory
+- Check that you're running from the ablation subdirectory
+- Verify the repository structure matches the expected layout (see Dependencies section)
+
+### Missing Checkpoints
+If you see warnings about missing checkpoint files:
+- Run the training phase first: `python run_dynamic_ablation_pipeline.py --train-only`
+- Or train individual models: `python train_ablation.py --model basic --episodes 3000`
+- The evaluation will use random initialization if checkpoints are missing (results will be poor)
+
+### Validation
+To verify your setup is correct:
+```bash
+python test_evaluation_logic.py
+```
+All 6 tests should pass.
 
 ## Citation
 

@@ -1,0 +1,34 @@
+# Generated outputs - do not commit
+ablation5_dynamic_metrics.csv
+ablation5_dynamic_metrics.txt
+eval_dynamic_5exp.csv
+eval_dynamic_5exp.txt
+
+# Model checkpoints
+models_*/
+best_model.pth
+best_navigation_model.pth
+*.pth
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

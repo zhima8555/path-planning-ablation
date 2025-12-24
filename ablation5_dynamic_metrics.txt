@@ -1,0 +1,21 @@
+DYNAMIC ABLATION EVALUATION
+Git commit: 523d233
+Timestamp: 2025-12-24 07:12:31 UTC
+K=20 scenarios/map | N=10 runs/scenario | max_steps=800
+
+=== Map: simple ===
+               A* | success=200/200 (1.000) | collision=0/200 (0.000) | timeout=0 | avg_len=85.98m | avg_time=17.97ms
+         RRT*+APF | success=167/200 (0.835) | collision=33/200 (0.165) | timeout=0 | avg_len=102.43m | avg_time=56.71ms
+
+=== Map: complex ===
+               A* | success=200/200 (1.000) | collision=0/200 (0.000) | timeout=0 | avg_len=87.32m | avg_time=20.90ms
+         RRT*+APF | success=141/200 (0.705) | collision=59/200 (0.295) | timeout=0 | avg_len=105.70m | avg_time=77.09ms
+
+=== Map: concave ===
+               A* | success=200/200 (1.000) | collision=0/200 (0.000) | timeout=0 | avg_len=97.35m | avg_time=65.79ms
+         RRT*+APF | success=120/200 (0.600) | collision=80/200 (0.400) | timeout=0 | avg_len=117.46m | avg_time=72.39ms
+
+=== Map: narrow ===
+               A* | success=200/200 (1.000) | collision=0/200 (0.000) | timeout=0 | avg_len=92.49m | avg_time=32.26ms
+         RRT*+APF | success=147/200 (0.735) | collision=53/200 (0.265) | timeout=0 | avg_len=108.26m | avg_time=106.41ms
+

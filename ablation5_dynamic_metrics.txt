@@ -1,6 +1,6 @@
 Dynamic Obstacle Ablation Evaluation
-Generated: 2025-12-24 07:51:05
-Git commit: 1c27920
+Generated: 2025-12-24 07:52:06
+Git commit: ebeee23
 Protocol: K=20 scenarios/map | N=10 runs/scenario | max_steps=800
 
 ================================================================================
@@ -32,5 +32,5 @@ Map Type: narrow
         full | success: 162/200 (81.00%) | collision:  20/200 (10.00%) | path:  88.85m | time:  6.87ms
 
 ================================================================================
-Evaluation completed at 2025-12-24 07:51:05
-Git commit: 1c27920
+Evaluation completed at 2025-12-24 07:52:07
+Git commit: ebeee23

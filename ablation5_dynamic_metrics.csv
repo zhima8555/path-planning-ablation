@@ -1,0 +1,17 @@
+# Generated: 2025-12-24 07:48:01
+# Git commit: c3b0947
+"# Protocol: K=20, N=10, max_steps=800"
+
+map_type,method,K,N,max_steps,success_count,collision_count,total,success_rate,collision_rate,avg_path_length_m,avg_wall_time_ms
+simple,basic,20,10,800,152,25,200,0.7600,0.1250,61.14,4.68
+simple,attention,20,10,800,167,18,200,0.8350,0.0900,53.58,6.05
+simple,full,20,10,800,189,3,200,0.9450,0.0150,47.51,6.88
+complex,basic,20,10,800,120,53,200,0.6000,0.2650,82.85,4.65
+complex,attention,20,10,800,144,41,200,0.7200,0.2050,72.25,6.02
+complex,full,20,10,800,175,15,200,0.8750,0.0750,64.09,6.81
+concave,basic,20,10,800,106,62,200,0.5300,0.3100,105.80,4.66
+concave,attention,20,10,800,124,51,200,0.6200,0.2550,92.24,6.02
+concave,full,20,10,800,164,28,200,0.8200,0.1400,82.35,6.83
+narrow,basic,20,10,800,91,52,200,0.4550,0.2600,114.29,4.67
+narrow,attention,20,10,800,120,40,200,0.6000,0.2000,99.80,6.03
+narrow,full,20,10,800,158,25,200,0.7900,0.1250,89.03,6.86

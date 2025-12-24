@@ -34,7 +34,7 @@ EPS_CLIP = 0.2
 K_EPOCHS = 10
 BATCH_SIZE = 128
 UPDATE_TIMESTEP = 512
-MAX_EPISODES = 3000
+MAX_EPISODES = 6000  # Updated to 6000 episodes as per requirements
 ENTROPY_COEF = 0.01
 GRAD_CLIP_NORM = 0.5
 VALUE_LOSS_COEF = 0.5
@@ -173,7 +173,7 @@ class PPOTrainer:
         self.policy_old.load_state_dict(self.policy.state_dict())
 
 
-def train(model_type='full', use_astar=True, max_episodes=MAX_EPISODES):
+def train(model_type='full', use_astar=True, max_episodes=MAX_EPISODES, seed=None):
     """
     训练函数
     
@@ -181,7 +181,17 @@ def train(model_type='full', use_astar=True, max_episodes=MAX_EPISODES):
         model_type: 'basic' | 'attention' | 'full'
         use_astar: 是否使用A*路径引导
         max_episodes: 最大训练回合数
+        seed: 随机种子（用于可复现性）
     """
+    # Set random seed for reproducibility
+    if seed is not None:
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)
+            torch.cuda.manual_seed_all(seed)  # For multi-GPU
+            torch.backends.cudnn.deterministic = True
+            torch.backends.cudnn.benchmark = False
     print("=" * 60)
     print(f"消融实验训练")
     print(f"  模型类型: {model_type}")
@@ -264,7 +274,22 @@ def train(model_type='full', use_astar=True, max_episodes=MAX_EPISODES):
             avg_reward = np.mean(episode_rewards[-100:])
             print(f"Episode {episode+1}/{max_episodes}, Avg Reward: {avg_reward:.2f}")
     
-    # 保存模型
+    # 保存模型到确定性位置
+    # Deterministic checkpoint locations based on model type
+    checkpoint_dir = "checkpoints"
+    os.makedirs(checkpoint_dir, exist_ok=True)
+    
+    # Save with deterministic names for evaluation pipeline
+    if model_type == 'basic':
+        model_path = os.path.join(checkpoint_dir, "model_basic_6k.pth")
+    elif model_type == 'attention':
+        model_path = os.path.join(checkpoint_dir, "model_attention_6k.pth")
+    else:  # full
+        model_path = os.path.join(checkpoint_dir, "model_full_6k.pth")
+    
+    torch.save(trainer.policy.state_dict(), model_path)
+    
+    # Also save to old location for backward compatibility
     save_dir = f"models_{model_type}_{'astar' if use_astar else 'noastar'}"
     os.makedirs(save_dir, exist_ok=True)
     torch.save(trainer.policy.state_dict(), f"{save_dir}/model.pth")
@@ -272,7 +297,9 @@ def train(model_type='full', use_astar=True, max_episodes=MAX_EPISODES):
     # 保存训练曲线
     np.save(f"{save_dir}/rewards.npy", np.array(episode_rewards))
     
-    print(f"\n训练完成！模型保存至: {save_dir}")
+    print(f"\n训练完成！")
+    print(f"  主要模型保存至: {model_path}")
+    print(f"  备份保存至: {save_dir}/model.pth")
     
     return episode_rewards
 
@@ -284,13 +311,16 @@ if __name__ == "__main__":
                        help='模型类型: basic(基础PPO), attention(双重注意力PPO), full(完整模型)')
     parser.add_argument('--no-astar', action='store_true',
                        help='不使用A*路径引导')
-    parser.add_argument('--episodes', type=int, default=3000,
-                       help='训练回合数')
+    parser.add_argument('--episodes', type=int, default=6000,
+                       help='训练回合数 (默认6000)')
+    parser.add_argument('--seed', type=int, default=None,
+                       help='随机种子（用于可复现性）')
     
     args = parser.parse_args()
     
     train(
         model_type=args.model,
         use_astar=not args.no_astar,
-        max_episodes=args.episodes
+        max_episodes=args.episodes,
+        seed=args.seed
     )

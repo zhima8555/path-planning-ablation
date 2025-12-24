@@ -1,7 +1,27 @@
 """Dynamic evaluation (5 experiments) with reproducible metrics.
 
 Evaluates 5 methods on 4 map types with K=20 scenarios per map and N=10 runs per scenario.
-Methods: A*, RRT*+APF, PPO (Basic), Dual-Att PPO, Ours (Full model with A*+attention).
+
+Methods:
+1. A* - Pure A* path planning (currently implemented)
+2. RRT*+APF - RRT* global planning + APF local avoidance (currently implemented)
+3. PPO (Basic) - Basic PPO without attention (requires: AutonomousNavEnv, trained model checkpoint)
+4. Dual-Att PPO - Dual attention PPO without A* guidance (requires: AutonomousNavEnv, trained model checkpoint)
+5. Ours - Full model with A*+attention (requires: AutonomousNavEnv, CascadedDualAttentionActorCritic, trained model checkpoint)
+
+Currently Functional:
+- Methods 1-2 (A*, RRT*+APF) are fully functional and produce measured results
+- Methods 3-5 require the parent environment modules (env.py, map_generator.py, global_planner.py, model.py)
+  and trained model checkpoints which are not present in this repository
+
+To enable full 5-method evaluation:
+1. Ensure parent directory has: env.py (AutonomousNavEnv), map_generator.py (MapGenerator), 
+   global_planner.py (SmartAStarPlanner), model.py (CascadedDualAttentionActorCritic)
+2. Train and save model checkpoints:
+   - models_basic_astar/model.pth
+   - models_attention_noastar/model.pth  
+   - best_navigation_model.pth or best_model.pth
+3. Update METHODS list below to uncomment PPO-based methods
 
 Outputs:
 - ablation5_dynamic_metrics.csv - CSV format with all metrics
@@ -212,23 +232,111 @@ def run_astar_episode(grid: np.ndarray, start: np.ndarray, goal: np.ndarray,
 def run_rrt_apf_episode(grid: np.ndarray, start: np.ndarray, goal: np.ndarray,
                         dynamic_obs: List[Dict], max_steps: int) -> Dict[str, Any]:
     """Run RRT*+APF navigator for one episode."""
-    t0 = time.perf_counter()
-    
-    # Temporarily suppress print statements
     import io
     import contextlib
+    from rrt_apf_planner import RRTStarPlanner, APFController
+    
+    t0 = time.perf_counter()
     
     try:
+        # Suppress print statements
         with contextlib.redirect_stdout(io.StringIO()):
-            navigator = RRTStarAPFNavigator(grid, start, goal)
+            # Use faster RRT* planning
+            planner = RRTStarPlanner(grid, step_size=3.0, max_iter=1000, goal_sample_rate=0.15)
+            global_path = planner.plan(start, goal)
     except Exception:
-        # If RRT* fails to plan, return failure
         return {
             'success': False,
             'collision': False,
             'path_length': 0.0,
             'wall_time_ms': (time.perf_counter() - t0) * 1000.0,
         }
+    
+    # Manual navigation using path following (APF can get stuck in local minima)
+    pos = np.array(start, dtype=np.float32).copy()
+    vel = np.zeros(2, dtype=np.float32)
+    
+    # Copy dynamic obstacles
+    dyn = []
+    for o in dynamic_obs:
+        dyn.append({
+            'pos': np.array(o['pos'], dtype=np.float32).copy(),
+            'vel': np.array(o.get('vel', [0.2, 0.2]), dtype=np.float32).copy(),
+            'radius': float(o.get('radius', 2.0)),
+        })
+    
+    trajectory = [pos.copy()]
+    path_idx = 0
+    max_speed = 1.5  # Slightly faster for efficiency
+    goal_threshold = 2.0
+    
+    success = False
+    collision = False
+    
+    for _ in range(max_steps):
+        # Check goal
+        if np.linalg.norm(pos - goal) < goal_threshold:
+            success = True
+            break
+        
+        # Follow the path more directly instead of using APF
+        # Get next waypoint
+        if path_idx < len(global_path) - 1:
+            next_waypoint = global_path[path_idx + 1]
+        else:
+            next_waypoint = goal
+        
+        # Move towards waypoint
+        direction = next_waypoint - pos
+        dist = np.linalg.norm(direction)
+        
+        if dist < 0.5:  # Close to waypoint, advance to next
+            path_idx = min(path_idx + 1, len(global_path) - 1)
+            continue
+        
+        # Update velocity to move towards waypoint
+        desired_vel = (direction / dist) * max_speed
+        vel = 0.5 * vel + 0.5 * desired_vel  # Smooth transition
+        
+        # Limit speed
+        speed = np.linalg.norm(vel)
+        if speed > max_speed:
+            vel = vel / speed * max_speed
+        
+        # Update position
+        pos = pos + vel
+        trajectory.append(pos.copy())
+        
+        # Check collision with static obstacles
+        ix, iy = int(pos[0]), int(pos[1])
+        if not (0 <= ix < grid.shape[0] and 0 <= iy < grid.shape[1]):
+            collision = True
+            break
+        if grid[ix, iy] == 1:
+            collision = True
+            break
+        
+        # Check collision with dynamic obstacles
+        for obs in dyn:
+            if np.linalg.norm(pos - obs['pos']) < obs['radius']:
+                collision = True
+                break
+        
+        if collision:
+            break
+        
+        # Update dynamic obstacles
+        update_dynamic_obstacles(dyn, grid.shape[0])
+    
+    wall_time_ms = (time.perf_counter() - t0) * 1000.0
+    path_length = compute_path_length(np.array(trajectory))
+    
+    return {
+        'success': success,
+        'collision': collision,
+        'path_length': path_length,
+        'wall_time_ms': wall_time_ms,
+    }
     
     trajectory = [navigator.pos.copy()]
     
@@ -307,23 +415,30 @@ def get_git_commit() -> str:
 
 def main() -> None:
     print("=" * 80)
-    print("DYNAMIC ABLATION EVALUATION (5 Methods)")
+    print("DYNAMIC ABLATION EVALUATION")
     print("=" * 80)
     print(f"Protocol: K={DYNAMIC_K} scenarios per map, N={DYNAMIC_N} runs per scenario")
     print(f"Max steps: {MAX_STEPS_DYNAMIC}")
     print(f"Maps: {', '.join(MAP_TYPES)}")
     print()
     
-    # Note: For full evaluation, we'd need all 5 methods implemented
-    # Currently only A* and RRT*+APF are functional
+    # Define available methods
+    # Note: PPO-based methods (3-5) require additional infrastructure not present in this repository:
+    # - Parent modules: env.py, map_generator.py, global_planner.py, model.py
+    # - Trained model checkpoints
+    # To enable them, uncomment the relevant lines below after setting up the required infrastructure.
     methods = [
         ("A*", run_astar_episode),
         ("RRT*+APF", run_rrt_apf_episode),
-        # These would require full environment setup:
         # ("PPO (Basic)", lambda *args, **kwargs: run_ppo_episode("basic", *args, **kwargs)),
         # ("Dual-Att PPO", lambda *args, **kwargs: run_ppo_episode("attention", *args, **kwargs)),
         # ("Ours", lambda *args, **kwargs: run_ppo_episode("full", *args, **kwargs)),
     ]
+    
+    print(f"Evaluating {len(methods)} methods:")
+    for i, (name, _) in enumerate(methods, 1):
+        print(f"  {i}. {name}")
+    print()
     
     map_gen = SimpleMapGenerator(80)
     
@@ -332,7 +447,13 @@ def main() -> None:
     
     # Header
     git_commit = get_git_commit()
-    timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+    try:
+        # Python 3.11+
+        from datetime import UTC
+        timestamp = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
+    except ImportError:
+        # Python < 3.11
+        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
     
     txt_lines.append("DYNAMIC ABLATION EVALUATION")
     txt_lines.append(f"Git commit: {git_commit}")

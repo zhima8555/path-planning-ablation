@@ -30,6 +30,15 @@ This repository contains an ablation study comparing 5 path planning methods wit
 
 ## Quick Start
 
+### Prerequisites
+
+**Important:** This ablation study requires the main path-planning repository to be properly set up. Ensure that the parent modules (`env.py`, `map_generator.py`, `global_planner.py`, `model.py`) are available in the parent directory before running the pipeline.
+
+If you're setting up for the first time:
+1. Clone/set up the main path-planning repository
+2. Navigate to the ablation directory
+3. Install Python dependencies: `pip install numpy torch matplotlib`
+
 ### Running the Complete Pipeline
 
 The easiest way to run the complete ablation study:
@@ -145,17 +154,36 @@ This ensures:
 
 ## Dependencies
 
-Required modules (assumed to be in parent directory):
-- `env.py` - AutonomousNavEnv
-- `map_generator.py` - MapGenerator
-- `global_planner.py` - SmartAStarPlanner
-- `model.py` - CascadedDualAttentionActorCritic
+### Required Parent Modules
+This ablation study package requires the main path-planning repository to be set up in the parent directory. The following modules must be available:
 
-Local modules:
-- `ppo_basic.py` - BasicPPOActorCritic
-- `ppo_attention.py` - DualAttentionPPOActorCritic
-- `rrt_apf_planner.py` - RRTStarAPFNavigator
-- `astar_planner.py` - AStarPlanner (for A* tracking baseline)
+- `env.py` - AutonomousNavEnv (autonomous navigation environment)
+- `map_generator.py` - MapGenerator (map generation utilities)
+- `global_planner.py` - SmartAStarPlanner (A* path planning)
+- `model.py` - CascadedDualAttentionActorCritic (full attention model)
+
+**Repository Structure:**
+```
+path-planning-repo/          # Main repository
+├── env.py
+├── map_generator.py
+├── global_planner.py
+├── model.py
+└── ablation/                 # This directory
+    ├── ppo_basic.py
+    ├── ppo_attention.py
+    ├── rrt_apf_planner.py
+    ├── train_ablation.py
+    ├── evaluate_5_experiments_dynamic.py
+    └── run_dynamic_ablation_pipeline.py
+```
+
+### Python Packages
+```bash
+pip install numpy torch matplotlib
+```
+
+If the main repository is not set up, the evaluation scripts will fail with module import errors.
 
 ## Additional Scripts
 

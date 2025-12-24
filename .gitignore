@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyTorch
+*.pth
+*.pt
+models_*/
+checkpoints/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Output files (but keep existing committed ones)
+ablation5_dynamic_metrics.csv
+ablation5_dynamic_metrics.txt
+dynamic_obstacle_metrics.csv
+dynamic_obstacle_metrics.txt
+dynamic_obstacle_metrics.png
+eval_static_all.csv
+eval_static_all.txt
+eval_dynamic_5exp.csv
+eval_dynamic_5exp.txt
+
+# Environment
+venv/
+ENV/
+env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db

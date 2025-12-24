@@ -132,10 +132,11 @@ class AutonomousNavEnv:
         
         # Check collision with static obstacles
         agent_x, agent_y = int(self.agent_pos[0]), int(self.agent_pos[1])
-        if not (0 <= agent_x < self.map_size and 0 <= agent_y < self.map_size):
-            done = True
-            collision = True
-        elif self.static_map[agent_x, agent_y] == 1:
+        # Clamp to valid range to prevent index errors
+        agent_x = max(0, min(agent_x, self.map_size - 1))
+        agent_y = max(0, min(agent_y, self.map_size - 1))
+        
+        if self.static_map[agent_x, agent_y] == 1:
             done = True
             collision = True
         

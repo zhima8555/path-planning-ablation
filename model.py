@@ -16,10 +16,14 @@ class PositionalEncoding2D(nn.Module):
         self.d_model = d_model
         
         pe = torch.zeros(height, width, d_model)
+        
+        # Precompute division terms for efficiency
+        div_terms = torch.tensor([10000.0 ** (k / d_model) for k in range(0, d_model, 2)])
+        
         for i in range(height):
             for j in range(width):
-                for k in range(0, d_model, 2):
-                    div_term = 10000.0 ** (k / d_model)
+                for idx, k in enumerate(range(0, d_model, 2)):
+                    div_term = div_terms[idx].item()
                     pe[i, j, k] = math.sin(i / div_term) + math.sin(j / div_term)
                     if k + 1 < d_model:
                         pe[i, j, k + 1] = math.cos(i / div_term) + math.cos(j / div_term)

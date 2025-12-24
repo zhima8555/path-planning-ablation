@@ -261,7 +261,7 @@ def run_ppo_model(model: torch.nn.Module, map_type: str, seed: int,
             img = torch.FloatTensor(obs['image']).unsqueeze(0).to(device)
             vec = torch.FloatTensor(obs['vector']).unsqueeze(0).to(device)
             
-            mu, std, val, hidden_state = model({'image': img, 'vector': vec}, hidden_state)
+            mu, std, _, hidden_state = model({'image': img, 'vector': vec}, hidden_state)
             action = mu.cpu().numpy().flatten()
             
             obs, _, done, _, info = env.step(action.astype(np.float32))

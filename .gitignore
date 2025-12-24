@@ -26,6 +26,10 @@ checkpoints/
 *.pth
 *.npy
 
+# Generated evaluation results (keep in repo for documentation)
+# ablation5_dynamic_metrics.csv
+# ablation5_dynamic_metrics.txt
+
 # Temporary files
 *.tmp
 .DS_Store
